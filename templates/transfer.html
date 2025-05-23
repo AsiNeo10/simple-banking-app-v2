@@ -3,9 +3,9 @@
 {% block content %}
 <div class="row">
     <div class="col-md-6 offset-md-3">
-        <div class="card">
-            <div class="card-header">
-                <h4>Transfer Money</h4>
+        <div class="card shadow-sm border-0">
+            <div class="card-header bg-primary text-white">
+                <h4 class="mb-0">Transfer Money</h4>
             </div>
             <div class="card-body">
                 <div class="alert alert-info">
@@ -17,43 +17,53 @@
                     
                     <div class="mb-3">
                         <label class="form-label">Transfer Method</label>
-                        <div class="btn-group w-100" role="group">
+                        <div class="btn-group w-100" role="group" aria-label="Transfer Method">
                             {% for subfield in form.transfer_type %}
-                            <input type="radio" class="btn-check" name="transfer_type" id="{{ subfield.id }}" value="{{ subfield.data }}" autocomplete="off"
-                                   {% if subfield.checked %}checked{% endif %}>
-                            <label class="btn btn-outline-primary" for="{{ subfield.id }}">{{ subfield.label }}</label>
+                                <input 
+                                    type="radio" 
+                                    class="btn-check" 
+                                    name="transfer_type" 
+                                    id="{{ subfield.id }}" 
+                                    value="{{ subfield.data }}" 
+                                    autocomplete="off"
+                                    {% if subfield.checked %}checked{% endif %}
+                                    required
+                                >
+                                <label class="btn btn-outline-primary" for="{{ subfield.id }}">{{ subfield.label }}</label>
                             {% endfor %}
                         </div>
                     </div>
-                    
+
                     <div class="mb-3" id="username-field">
                         {{ form.recipient_username.label(class="form-label") }}
-                        {{ form.recipient_username(class="form-control") }}
+                        {{ form.recipient_username(class="form-control", autocomplete="off", minlength="3", maxlength="30") }}
                         {% for error in form.recipient_username.errors %}
-                        <div class="text-danger">{{ error }}</div>
+                            <div class="text-danger small">{{ error }}</div>
                         {% endfor %}
                     </div>
-                    
+
                     <div class="mb-3" id="account-field" style="display: none;">
                         {{ form.recipient_account.label(class="form-label") }}
-                        {{ form.recipient_account(class="form-control") }}
+                        {{ form.recipient_account(class="form-control", autocomplete="off", minlength="10", maxlength="20") }}
                         {% for error in form.recipient_account.errors %}
-                        <div class="text-danger">{{ error }}</div>
+                            <div class="text-danger small">{{ error }}</div>
                         {% endfor %}
                     </div>
-                    
+
                     <div class="mb-3">
                         {{ form.amount.label(class="form-label") }}
                         <div class="input-group">
                             <span class="input-group-text">₱</span>
-                            {{ form.amount(class="form-control") }}
+                            {{ form.amount(class="form-control", min="1", step="0.01", required=True, autocomplete="off") }}
                         </div>
+                        <div class="form-text">Minimum amount: ₱1.00</div>
                         {% for error in form.amount.errors %}
-                        <div class="text-danger">{{ error }}</div>
+                            <div class="text-danger small">{{ error }}</div>
                         {% endfor %}
                     </div>
+
                     <div class="d-grid gap-2">
-                        {{ form.submit(class="btn btn-primary") }}
+                        {{ form.submit(class="btn btn-success") }}
                     </div>
                 </form>
             </div>
@@ -61,37 +71,22 @@
     </div>
 </div>
 
+<!-- Secure dynamic toggle -->
 <script>
-document.addEventListener('DOMContentLoaded', function() {
-    // Show/hide fields based on transfer type
-    var transferType = document.getElementsByName('transfer_type');
-    var usernameField = document.getElementById('username-field');
-    var accountField = document.getElementById('account-field');
-    
-    for (var i = 0; i < transferType.length; i++) {
-        transferType[i].addEventListener('change', function() {
-            if (this.value === 'username') {
-                usernameField.style.display = 'block';
-                accountField.style.display = 'none';
-            } else if (this.value === 'account') {
-                usernameField.style.display = 'none';
-                accountField.style.display = 'block';
-            }
-        });
+document.addEventListener('DOMContentLoaded', () => {
+    const usernameField = document.getElementById('username-field');
+    const accountField = document.getElementById('account-field');
+    const transferTypeRadios = document.querySelectorAll('input[name="transfer_type"]');
+
+    function toggleFields(type) {
+        usernameField.style.display = type === 'username' ? 'block' : 'none';
+        accountField.style.display = type === 'account' ? 'block' : 'none';
     }
-    
-    // Set initial state
-    for (var i = 0; i < transferType.length; i++) {
-        if (transferType[i].checked) {
-            if (transferType[i].value === 'username') {
-                usernameField.style.display = 'block';
-                accountField.style.display = 'none';
-            } else if (transferType[i].value === 'account') {
-                usernameField.style.display = 'none';
-                accountField.style.display = 'block';
-            }
-        }
-    }
+
+    transferTypeRadios.forEach(radio => {
+        radio.addEventListener('change', () => toggleFields(radio.value));
+        if (radio.checked) toggleFields(radio.value);
+    });
 });
 </script>
-{% endblock %} 
+{% endblock %}
