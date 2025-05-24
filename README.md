@@ -81,8 +81,6 @@ This section outlines the specific updates made to the application to address th
 
 ## Penetration Testing Report Summary
 
-*(Note: A formal penetration testing engagement was not conducted for this project. The security improvements were based on code review and identified potential vulnerabilities. A proper penetration test would involve active exploitation attempts and a more comprehensive report.)*
-
 The following steps were taken to remediate the identified potential vulnerabilities:
 
 -   Implemented atomic transactions for financial operations.
